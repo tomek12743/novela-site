@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novela UA</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1bDpZ1W1M4VQlcvZmnueDqWhNysMaRbM",
+      authDomain: "novela-79f77.firebaseapp.com",
+      projectId: "novela-79f77",
+      storageBucket: "novela-79f77.firebasestorage.app",
+      messagingSenderId: "1016970384478",
+      appId: "1:1016970384478:web:44e1e0a41ffe3a657c50cf",
+      measurementId: "G-H2DBHBXEEL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadNovels() {
+      const novelsCol = collection(db, "novels");
+      const novelSnapshot = await getDocs(novelsCol);
+      const novelList = novelSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const list = document.getElementById("novels");
+      list.innerHTML = "";
+      novelList.forEach(novel => {
+        const item = document.createElement("div");
+        item.innerHTML = `
+          <h2>${novel.title}</h2>
+          <p>${novel.description}</p>
+          <button onclick="loadChapters('${novel.id}', '${novel.title}')">Читати</button>
+          <hr>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    window.loadChapters = async function(novelId, novelTitle) {
+      const chaptersCol = collection(db, `novels/${novelId}/chapters`);
+      const q = query(chaptersCol, orderBy("number"));
+      const chaptersSnapshot = await getDocs(q);
+
+      const list = document.getElementById("novels");
+      list.innerHTML = `<h2>${novelTitle}</h2><a href="#" onclick="loadNovels()">← Назад до новел</a><br><br>`;
+
+      chaptersSnapshot.forEach(doc => {
+        const chapter = doc.data();
+        const item = document.createElement("div");
+        item.innerHTML = `
+          <h3>${chapter.title}</h3>
+          <p>${chapter.text.replaceAll('\n', '<br>')}</p>
+          <hr>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    loadNovels();
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
+    h1 { text-align: center; }
+    hr { margin: 1.5rem 0; }
+    button { padding: 6px 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>📚 Новели українською</h1>
+  <div id="novels">
+    <p>Завантаження новел...</p>
+  </div>
+</body>
+</html>
