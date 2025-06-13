@@ -2,12 +2,37 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Novela UA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генетичне сходження – Розділ 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #chapter {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Генетичне сходження – Розділ 1</h1>
+  <div id="chapter">Завантаження...</div>
+
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // Налаштування Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyC1bDpZ1W1M4VQlcvZmnueDqWhNysMaRbM",
       authDomain: "novela-79f77.firebaseapp.com",
@@ -21,58 +46,19 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function loadNovels() {
-      const novelsCol = collection(db, "novels");
-      const novelSnapshot = await getDocs(novelsCol);
-      const novelList = novelSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Отримати перший розділ
+    async function getFirstChapter() {
+      const docRef = doc(db, "novels", "genetic-ascension", "chapters", "chapter-1");
+      const docSnap = await getDoc(docRef);
 
-      const list = document.getElementById("novels");
-      list.innerHTML = "";
-      novelList.forEach(novel => {
-        const item = document.createElement("div");
-        item.innerHTML = `
-          <h2>${novel.title}</h2>
-          <p>${novel.description}</p>
-          <button onclick="loadChapters('${novel.id}', '${novel.title}')">Читати</button>
-          <hr>
-        `;
-        list.appendChild(item);
-      });
+      if (docSnap.exists()) {
+        document.getElementById("chapter").innerText = docSnap.data().text;
+      } else {
+        document.getElementById("chapter").innerText = "Розділ не знайдено.";
+      }
     }
 
-    window.loadChapters = async function(novelId, novelTitle) {
-      const chaptersCol = collection(db, `novels/${novelId}/chapters`);
-      const q = query(chaptersCol, orderBy("number"));
-      const chaptersSnapshot = await getDocs(q);
-
-      const list = document.getElementById("novels");
-      list.innerHTML = `<h2>${novelTitle}</h2><a href="#" onclick="loadNovels()">← Назад до новел</a><br><br>`;
-
-      chaptersSnapshot.forEach(doc => {
-        const chapter = doc.data();
-        const item = document.createElement("div");
-        item.innerHTML = `
-          <h3>${chapter.title}</h3>
-          <p>${chapter.text.replaceAll('\n', '<br>')}</p>
-          <hr>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    loadNovels();
+    getFirstChapter();
   </script>
-  <style>
-    body { font-family: sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
-    h1 { text-align: center; }
-    hr { margin: 1.5rem 0; }
-    button { padding: 6px 10px; margin-top: 10px; }
-  </style>
-</head>
-<body>
-  <h1>📚 Новели українською</h1>
-  <div id="novels">
-    <p>Завантаження новел...</p>
-  </div>
 </body>
 </html>
