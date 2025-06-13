@@ -45,4 +45,65 @@
     <button onclick="prevChapter()">⬅️ Попередній</button>
     <button onclick="nextChapter()">Наступний ➡️</button>
   </div>
-  <div id="chapter">Завант
+  <div id="chapter">Завантаження...</div>
+
+  <!-- Firebase SDK без import -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    // Налаштування Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1bDpZ1W1M4VQlcvZmnueDqWhNysMaRbM",
+      authDomain: "novela-79f77.firebaseapp.com",
+      projectId: "novela-79f77",
+      storageBucket: "novela-79f77.appspot.com",
+      messagingSenderId: "1016970384478",
+      appId: "1:1016970384478:web:44e1e0a41ffe3a657c50cf",
+      measurementId: "G-H2DBHBXEEL"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentChapter = 1;
+    const maxChapter = 3;
+
+    async function loadChapter(chapterNumber) {
+      const chapterId = `chapter-${chapterNumber}`;
+      const chapterElement = document.getElementById("chapter");
+      chapterElement.innerText = "Завантаження...";
+
+      try {
+        const docRef = db.collection("novels").doc("genetic-ascension").collection("chapters").doc(chapterId);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+          chapterElement.innerText = docSnap.data().text;
+        } else {
+          chapterElement.innerText = "Розділ не знайдено.";
+        }
+      } catch (error) {
+        chapterElement.innerText = "Помилка завантаження.";
+        console.error("Помилка:", error);
+      }
+    }
+
+    function nextChapter() {
+      if (currentChapter < maxChapter) {
+        currentChapter++;
+        loadChapter(currentChapter);
+      }
+    }
+
+    function prevChapter() {
+      if (currentChapter > 1) {
+        currentChapter--;
+        loadChapter(currentChapter);
+      }
+    }
+
+    // Початкове завантаження
+    loadChapter(currentChapter);
+  </script>
+</body>
+</html>
