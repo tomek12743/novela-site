@@ -42,50 +42,7 @@
 <body>
   <h1>Генетичне сходження</h1>
   <div class="buttons">
-    <button onclick="loadChapter('chapter-1')">Розділ 1</button>
-    <button onclick="loadChapter('chapter-2')">Розділ 2</button>
-    <button onclick="loadChapter('chapter-3')">Розділ 3</button>
+    <button onclick="prevChapter()">⬅️ Попередній</button>
+    <button onclick="nextChapter()">Наступний ➡️</button>
   </div>
-  <div id="chapter">Завантаження...</div>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC1bDpZ1W1M4VQlcvZmnueDqWhNysMaRbM",
-      authDomain: "novela-79f77.firebaseapp.com",
-      projectId: "novela-79f77",
-      storageBucket: "novela-79f77.appspot.com",
-      messagingSenderId: "1016970384478",
-      appId: "1:1016970384478:web:44e1e0a41ffe3a657c50cf",
-      measurementId: "G-H2DBHBXEEL"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function loadChapter(chapterId) {
-      const chapterElement = document.getElementById("chapter");
-      chapterElement.innerText = "Завантаження...";
-      try {
-        const docRef = doc(db, "novels", "genetic-ascension", "chapters", chapterId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          chapterElement.innerText = docSnap.data().text;
-        } else {
-          chapterElement.innerText = "Розділ не знайдено.";
-        }
-      } catch (error) {
-        chapterElement.innerText = "Помилка завантаження.";
-        console.error("Помилка:", error);
-      }
-    }
-
-    // Завантажити перший розділ за замовчуванням
-    loadChapter("chapter-1");
-  </script>
-</body>
-</html>
+  <div id="chapter">Завант
