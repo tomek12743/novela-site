@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Генетичне сходження – Розділ 1</title>
+  <title>Генетичне сходження</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -20,11 +20,32 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      margin-bottom: 20px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4285f4;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3367d6;
     }
   </style>
 </head>
 <body>
-  <h1>Генетичне сходження – Розділ 1</h1>
+  <h1>Генетичне сходження</h1>
+  <div class="buttons">
+    <button onclick="loadChapter('chapter-1')">Розділ 1</button>
+    <button onclick="loadChapter('chapter-2')">Розділ 2</button>
+    <button onclick="loadChapter('chapter-3')">Розділ 3</button>
+  </div>
   <div id="chapter">Завантаження...</div>
 
   <!-- Firebase SDK -->
@@ -32,12 +53,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Налаштування Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyC1bDpZ1W1M4VQlcvZmnueDqWhNysMaRbM",
       authDomain: "novela-79f77.firebaseapp.com",
       projectId: "novela-79f77",
-      storageBucket: "novela-79f77.firebasestorage.app",
+      storageBucket: "novela-79f77.appspot.com",
       messagingSenderId: "1016970384478",
       appId: "1:1016970384478:web:44e1e0a41ffe3a657c50cf",
       measurementId: "G-H2DBHBXEEL"
@@ -46,19 +66,26 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Отримати перший розділ
-    async function getFirstChapter() {
-      const docRef = doc(db, "novels", "genetic-ascension", "chapters", "chapter-1");
-      const docSnap = await getDoc(docRef);
+    async function loadChapter(chapterId) {
+      const chapterElement = document.getElementById("chapter");
+      chapterElement.innerText = "Завантаження...";
+      try {
+        const docRef = doc(db, "novels", "genetic-ascension", "chapters", chapterId);
+        const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        document.getElementById("chapter").innerText = docSnap.data().text;
-      } else {
-        document.getElementById("chapter").innerText = "Розділ не знайдено.";
+        if (docSnap.exists()) {
+          chapterElement.innerText = docSnap.data().text;
+        } else {
+          chapterElement.innerText = "Розділ не знайдено.";
+        }
+      } catch (error) {
+        chapterElement.innerText = "Помилка завантаження.";
+        console.error("Помилка:", error);
       }
     }
 
-    getFirstChapter();
+    // Завантажити перший розділ за замовчуванням
+    loadChapter("chapter-1");
   </script>
 </body>
 </html>
